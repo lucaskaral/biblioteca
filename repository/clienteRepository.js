@@ -106,3 +106,32 @@ exports.deletar = (id, callback) => {
         }
     })            
 }
+
+
+exports.buscarPorUserName = (userName, callback) => {
+
+    const sql = "SELECT * FROM clientes WHERE username=?";
+
+    conexao.query(sql, [userName], (err, rows) => {
+        if(err){
+            console.log("------_>>> falha ao consultar usuário..")
+            const error = {
+                status: 500,
+                msg: err
+            }
+            callback(error, null);
+        }
+        else {
+            if(rows && rows.length > 0){
+                callback(null,rows[0])
+            }
+            else{ 
+                const error = {
+                    status: 404,
+                    msg: "Usuario nao encontrado!"
+                }
+                callback(error, null);
+            }
+        }
+    })
+}

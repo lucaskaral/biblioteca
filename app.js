@@ -1,10 +1,16 @@
 const express = require('express')
-
+const clienteController = require('../Biblioteca/controller/clienteController')
 const app = express()
 const port = 3000
 
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
+const authRota = require('./rotas/authRotas')
+app.use('/api/auth', authRota)
+
+//Middleware para autenticação
+app.use(clienteController.validarToken)
 
 //Rotas
 const livroRota = require('./rotas/livroRotas')
