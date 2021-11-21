@@ -138,7 +138,7 @@ exports.deletar = (id, callback) => {
 }
 
 exports.buscarPorTitulo = (titulo, callback) => {
-    console.log("buscando por titulo")
+    console.log("buscando por titulo");
     const sql = "SELECT * FROM livros WHERE titulo LIKE CONCAT('%', ? , '%')";
 
     conexao.query(sql, [titulo], (err, rows) => {
@@ -157,6 +157,31 @@ exports.buscarPorTitulo = (titulo, callback) => {
                 const error = {
                     status: 404,
                     msg: "Livro nao encontrado!"
+                }
+                callback(error, null);
+            }
+        }
+    })
+}
+
+exports.buscarPorAutor = (id_autor, callback) => {
+    console.log("Buscando po autor.");
+    const sql = "SELECT L.* FROM LIVROS L INNER JOIN LIVROS_AUTORES LA ON LA.ID_LIVRO = L.ID WHERE LA.ID_AUTOR = ?";
+
+    conexao.query(sql, [id_autor], (err, rows) => {
+        if(err){
+            const error = {
+                status: 500,
+                msg: err
+            }
+            callback(error, null);
+        } else {
+            if (rows && rows.length > 0) {
+                callback(null,rows[0])
+            } else { 
+                const error = {
+                    status: 404,
+                    msg: "Nao foram encontrados livros para este autor!"
                 }
                 callback(error, null);
             }

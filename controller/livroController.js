@@ -136,3 +136,27 @@ exports.buscarPorTitulo = (req, res) => {
         })
     }
 }
+
+
+exports.buscarPorAutor = (req, res) => {  
+    console.log("params: " + JSON.stringify(req.params));
+    const id_autor = req.params.id_autor;
+    console.log(id_autor);
+    if (!id_autor) {
+        const error = {
+            status: 400,
+            msg: "Autor não informado!"
+        }
+        res.status(error.status).json(error)
+    }
+    else{
+        livroRepository.buscarPorAutor(titulo, (erro, livros) => {
+            if (erro) {
+                res.status(erro.status).json(erro)
+            }
+            else {
+                res.json(livros)
+            }
+        })
+    }
+}
