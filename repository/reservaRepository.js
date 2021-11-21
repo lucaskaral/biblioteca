@@ -15,9 +15,9 @@ exports.listar = (callback) => {
 
 exports.inserir = (reserva, callback) => {   
     //SQL
-    const sql = "INSERT INTO reservas(id_livro, data_inicio, data_fim) VALUES (?,?,?)"
+    const sql = "INSERT INTO reservas(id_livro, id_cliente, data_inicio, data_fim) VALUES (?,?,?)"
 
-    conexao.query(sql, [reserva.idLivro, reserva.dataInicio, reserva.dataFim],
+    conexao.query(sql, [reserva.idLivro, reserva.id_cliente, reserva.dataInicio, reserva.dataFim],
         (erro, rows) => {
             if(erro){
                 callback(erro, null)

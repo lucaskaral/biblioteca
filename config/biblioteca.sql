@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 09-Jun-2021 às 03:14
+-- Generation Time: 21-Nov-2021 às 03:54
 -- Versão do servidor: 10.1.38-MariaDB
 -- versão do PHP: 7.3.4
 
@@ -51,15 +51,17 @@ INSERT INTO `autores` (`ID`, `nome`, `pais`) VALUES
 CREATE TABLE `clientes` (
   `ID` bigint(20) NOT NULL,
   `nome` varchar(255) DEFAULT NULL,
-  `telefone` varchar(11) DEFAULT NULL
+  `telefone` varchar(11) DEFAULT NULL,
+  `username` varchar(255) NOT NULL,
+  `senha` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Extraindo dados da tabela `clientes`
 --
 
-INSERT INTO `clientes` (`ID`, `nome`, `telefone`) VALUES
-(1, 'Lucas Formiga Karal', '51985093905');
+INSERT INTO `clientes` (`ID`, `nome`, `telefone`, `username`, `senha`) VALUES
+(1, 'Lucas Formiga Karal', '51985093905', 'lucaskaral', 'password');
 
 -- --------------------------------------------------------
 
@@ -112,6 +114,7 @@ INSERT INTO `livros_autores` (`id_livro`, `id_autor`) VALUES
 CREATE TABLE `reservas` (
   `ID` int(11) NOT NULL,
   `id_livro` int(11) NOT NULL,
+  `id:cliente` int(11) NOT NULL,
   `data_inicio` date NOT NULL,
   `data_fim` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -120,8 +123,8 @@ CREATE TABLE `reservas` (
 -- Extraindo dados da tabela `reservas`
 --
 
-INSERT INTO `reservas` (`ID`, `id_livro`, `data_inicio`, `data_fim`) VALUES
-(2, 1, '2021-06-06', '2021-06-26');
+INSERT INTO `reservas` (`ID`, `id_livro`, `id:cliente`, `data_inicio`, `data_fim`) VALUES
+(2, 1, 0, '2021-06-06', '2021-06-26');
 
 --
 -- Indexes for dumped tables
@@ -137,7 +140,8 @@ ALTER TABLE `autores`
 -- Indexes for table `clientes`
 --
 ALTER TABLE `clientes`
-  ADD PRIMARY KEY (`ID`);
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `username` (`username`,`senha`);
 
 --
 -- Indexes for table `livros`
@@ -160,6 +164,7 @@ ALTER TABLE `livros_autores`
 --
 ALTER TABLE `reservas`
   ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `id_cliente` (`id:cliente`),
   ADD KEY `fk_livro` (`id_livro`);
 
 --

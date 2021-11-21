@@ -53,7 +53,7 @@ exports.atualizar = (req, res) => {
     const id = +req.params.id;
     const reserva = req.body;
 
-    if(isNaN(id)) {
+    if (isNaN(id)) {
         const error = {
             status: 400,
             msg: "Id deve ser um numero!"
@@ -74,24 +74,23 @@ exports.atualizar = (req, res) => {
 
 exports.deletar = (req, res) => {
     const id = +req.params.id;
-    if(isNaN(id)){
+    if (isNaN(id)){
         const error = {
             status: 400,
             msg: "Id deve ser um numero"
         }
         res.status(error.status).json(error)
     }
-    else{
+    else {
         reservaRepository.buscarPorId(id, (erro, reserva) => {
             if(erro){
                 res.status(erro.status).json(erro)
             }
             else {
                 reservaRepository.deletar(id, (erro, id) => {
-                    if(erro){
+                    if (erro) {
                         res.status(erro.status).json(erro)
-                    }
-                    else {
+                    } else {
                         res.json(reserva)
                     }        
                 })
