@@ -114,7 +114,7 @@ exports.buscarPorUserName = (userName, callback) => {
 
     conexao.query(sql, [userName], (err, rows) => {
         if(err){
-            console.log("------_>>> falha ao consultar usuário..")
+            console.log("------_>>> falha ao consultar usuário.. " + err);
             const error = {
                 status: 500,
                 msg: err

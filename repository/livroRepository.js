@@ -2,11 +2,11 @@ const { json } = require('express');
 const conexao = require('../config/conexaoDB')
 
 exports.listar = (callback) => {
-
+    console.log("Listando livros");
     const sql = "SELECT * FROM livros";
 
     conexao.query(sql, (erro, rows) => {
-        if(erro){            
+        if (erro) {
             callback(erro,null);
         }
         else {
@@ -17,11 +17,13 @@ exports.listar = (callback) => {
 
 exports.inserir = (livro, callback) => {   
     //SQL
+    console.log("Inserindo livros");
     const sql = "INSERT INTO livros(titulo, editora, ano_publicacao, ISBN) VALUES (?,?,?,?)"
 
     conexao.query(sql, [livro.titulo, livro.editora, livro.anoPublicacao, livro.ISBN],
         (erro, rows) => {
             if(erro){
+                console.log("Erro ao inserir livros: " + erro);
                 callback(erro, null)
             }
             else {
@@ -30,6 +32,37 @@ exports.inserir = (livro, callback) => {
                 callback(null, livro)
             }
     });
+}
+
+exports.validarIdsAutores = (arrIdsAutores) => {
+    var consultaOk = true;
+
+    for (let index = 0; index < arrIdsAutores.length; index++) {
+        console.log("Validando idAutor: " + arrIdsAutores[index]);
+        sqlAutores = "SELECT * FROM autores WHERE id=?";
+        conexao.query(sqlAutores, [arrIdsAutores[index]],
+            (erro, rows) => {
+                if (erro) {
+                    console.log("Erro consulta autor: " + erro);
+                    consultaOk = false;
+                }
+                console.log("Autores rows: " + rows.length);
+                if (rows.length <= 0) {
+                    console.log("Autor nao encontrado: " + arrIdsAutores[index]);
+                    consultaOk = false;
+                }
+        });
+        console.log("Resultado consulta: " + consultaOk);
+        if (!consultaOk) {
+            break;
+        }
+    }
+
+    if (!consultaOk) {
+        return false;
+    }
+    console.log("Consulta autores exitosa.");
+    return true;
 }
 
 exports.inserirAutores = (livro, callback) => {
@@ -43,10 +76,9 @@ exports.inserirAutores = (livro, callback) => {
 
         conexao.query(sqlLivrosAutores, [arrIds],
             (erro, rows) => {
-                if(erro){
+                if (erro) {
                     callback(erro, null);
-                }
-                else {
+                } else {
                     callback(null, livro);
                 }
         });
@@ -91,14 +123,13 @@ exports.atualizar = (id, livro, callback) => {
     const sql = "UPDATE livros SET titulo=?, ISBN=?, ano_publicacao=?, editora=? WHERE id=?";
 
     conexao.query(sql, [livro.titulo, livro.ISBN, livro.anoPublicacao, livro.editora, id], (err, livroAtualizado) => {
-        if(err){
+        if (err) {
             const error = {
                 status: 500,
                 msg: err
             }
             callback(error, null);
-        }
-        else {
+        } else {
             if(livroAtualizado.affectedRows > 0) {
                 callback(null, livroAtualizado);
             } else {
@@ -113,20 +144,20 @@ exports.atualizar = (id, livro, callback) => {
 }
 
 exports.deletar = (id, callback) => {
-    const sql = `DELETE FROM livros WHERE id=?`;
+    console.log("Deletando livro ID:" + id);
+    const sql = "DELETE FROM livros WHERE id=?";
     conexao.query(sql, [id], (err, rows) => {
-        if(err){
+        if (err) {
+            console.log("Falha ao deletar livro. " + err);
             const error = {
                 status: 500,
                 msg: err
             }
             callback(err, null);
-        }
-        else {
-            if(rows.affectedRows){
+        } else {
+            if (rows.affectedRows) {
                 callback(null, id);
-            }
-            else {
+            } else {
                 const error = {
                     status: 500,
                     msg: err
@@ -134,7 +165,33 @@ exports.deletar = (id, callback) => {
                 callback(err, null);    
             }
         }
-    })            
+    });         
+}
+
+//Remove livro da tabela de relação livros_autores
+exports.deletarLivrosAutores = (id, callback) => {
+    console.log("Deletando livro da tabela livros_autores LIVRO_ID:" + id);
+    const sql = "DELETE FROM livros_autores WHERE id_livro=?";
+    conexao.query(sql, [id], (err, rows) => {
+        if (err) {
+            console.log("Falha ao deletar livro da tabela livros_autores. " + err);
+            const error = {
+                status: 500,
+                msg: err
+            }
+            callback(err, null);
+        } else {
+            if (rows.affectedRows) {
+                callback(null, id);
+            } else {
+                const error = {
+                    status: 500,
+                    msg: err
+                }
+                callback(err, null);    
+            }
+        }
+    });         
 }
 
 exports.buscarPorTitulo = (titulo, callback) => {

@@ -14,23 +14,37 @@ exports.listar = (req, res) => {
     })
 }
 
-exports.inserir = (req, res) => {    
+validarIdsAutores = (idsAutores) => {
+    return livroRepository.validarIdsAutores(idsAutores);
+}
+
+exports.inserir = (req, res) => {
     //Obter o dado do request - nome e o preco
     const livro = req.body;
+    if (!validarIdsAutores(livro.idsAutores.split(","))) {
+        res.status(500).json({"erro:":"Database Error"});
+        return;
+    }
     var bError = false;
     var livroSalvoBase;
     livroRepository.inserir(livro, (erro, livroSalvo) => {
-        if(erro){
+        if (erro) {
             res.status(500).json({"erro:":"Database Error"});
             console.log(erro);
             bError = true;
-        }
-        else {
+        } else {
             livroSalvoBase = livroSalvo;
             console.log("livroSalvoBase:... " + JSON.stringify(livroSalvoBase));
-//          res.status(201).json(livroSalvo);
             livroRepository.inserirAutores(livroSalvoBase, (erro, livroSalvo) => {
-                if(erro){
+                if (erro) {
+                    console.log("Limpando livro: " + JSON.stringify(livroSalvoBase));
+                    livroRepository.deletar(livroSalvoBase.id, (error, livro) => {
+                        if (error) {
+                            res.status(erro.status).json(error);
+                        } else {
+                            res.status(201).json(livroSalvo);
+                        }
+                    });
                     res.status(500).json({"erro:":"Database Error"});
                     console.log(erro);
                 } else {
@@ -42,6 +56,7 @@ exports.inserir = (req, res) => {
 }
 
 exports.buscarPorId = (req, res) => {
+
     console.log("Parametrossss " + JSON.stringify(req.params));
     const id = +req.params.id;
     if(isNaN(id)) {
@@ -64,6 +79,7 @@ exports.buscarPorId = (req, res) => {
 }
 
 exports.atualizar = (req, res) => {
+
     const id = +req.params.id;
     const livro = req.body;
 
@@ -87,34 +103,33 @@ exports.atualizar = (req, res) => {
 }
 
 exports.deletar = (req, res) => {
-    const id = +req.params.id;
-    if(isNaN(id)){
-        const error = {
-            status: 400,
-            msg: "Id deve ser um numero"
+    const id = req.params.id;
+    console.log("Deletando livro: " + id);
+    livroRepository.buscarPorId(id, (erro, livro) => {
+        if(erro){
+            res.status(erro.status).json(erro)
         }
-        res.status(error.status).json(error)
-    }
-    else{
-        livroRepository.buscarPorId(id, (erro, livro) => {
-            if(erro){
-                res.status(erro.status).json(erro)
-            }
-            else {
-                livroRepository.deletar (id, (erro, id) => {
-                    if(erro){
-                        res.status(erro.status).json(erro)
-                    }
-                    else {
-                        res.json(livro)
-                    }        
-                })
-            }
-        })
-    }
+        else {
+            livroRepository.deletarLivrosAutores(id, (error, id_livro) => {
+                if (error) {
+                    res.status(erro.status).json(error);
+                } else {
+                    livroRepository.deletar(id, (erro, id_livro) => {
+                        if(erro){
+                            res.status(erro.status).json(erro)
+                        }
+                        else {
+                            res.json(livro)
+                        }        
+                    });
+                }
+            });
+        }
+    });
 }
 
 exports.buscarPorTitulo = (req, res) => {  
+
     console.log("params: " + JSON.stringify(req.params));
     const titulo = req.params.titulo;
     console.log(titulo);
@@ -138,7 +153,8 @@ exports.buscarPorTitulo = (req, res) => {
 }
 
 
-exports.buscarPorAutor = (req, res) => {  
+exports.buscarPorAutor = (req, res) => {
+
     console.log("params: " + JSON.stringify(req.params));
     const id_autor = req.params.id_autor;
     console.log(id_autor);

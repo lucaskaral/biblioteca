@@ -13,7 +13,7 @@ exports.listar = (req, res) => {
     })
 }
 
-exports.inserir = (req, res) => {    
+exports.inserir = (req, res) => {  
     //Obter o dado do request - nome e o preco
     const reserva = req.body;
     
@@ -28,7 +28,7 @@ exports.inserir = (req, res) => {
     })
 }
 
-exports.buscarPorId = (req, res) => {    
+exports.buscarPorId = (req, res) => {
     const id = +req.params.id;
     if(isNaN(id)){
         const error = {

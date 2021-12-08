@@ -14,18 +14,18 @@ app.use(clienteController.validarToken)
 
 //Rotas
 const livroRota = require('./rotas/livroRotas')
-app.use('/api/livros',livroRota)
+app.use('/api/livros', livroRota)
 
 const autorRota = require('./rotas/autorRotas')
-app.use('/api/autores',autorRota)
+app.use('/api/autores', autorRota)
 
 const clienteRota = require('./rotas/clienteRotas')
-app.use('/api/clientes',clienteRota)
+app.use('/api/clientes', clienteRota)
 
 const reservaRota = require('./rotas/reservaRotas')
-app.use('/api/reservas',reservaRota)
+app.use('/api/reservas', reservaRota)
 
 
 app.listen(port, () => {
     console.log(`Executando servidor em http://localhost:${port}`)
-  })
+});

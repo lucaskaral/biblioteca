@@ -2,6 +2,7 @@ const conexao = require('../config/conexaoDB')
 const autorRepository = require('../repository/autorRepository')
 
 exports.listar = (req, res) => {
+
     autorRepository.listar((erro,autores) => {
         if(erro){
             res.status(500).json({"erro:":"Database Error"})
@@ -13,7 +14,8 @@ exports.listar = (req, res) => {
     })
 }
 
-exports.inserir = (req, res) => {    
+exports.inserir = (req, res) => {  
+
     //Obter o dado do request - nome e o preco
     const autor = req.body;
     
@@ -28,7 +30,8 @@ exports.inserir = (req, res) => {
     })
 }
 
-exports.buscarPorId = (req, res) => {    
+exports.buscarPorId = (req, res) => {   
+
     const id = +req.params.id;
     if(isNaN(id)){
         const error = {
@@ -50,6 +53,7 @@ exports.buscarPorId = (req, res) => {
 }
 
 exports.atualizar = (req, res) => {
+
     const id = +req.params.id;
     const autor = req.body;
 
@@ -73,6 +77,8 @@ exports.atualizar = (req, res) => {
 }
 
 exports.deletar = (req, res) => {
+
+
     const id = +req.params.id;
     if(isNaN(id)){
         const error = {

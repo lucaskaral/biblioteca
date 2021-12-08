@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const clienteRepository = require('../repository/clienteRepository')
 
 exports.listar = (req, res) => {
+
     clienteRepository.listar((erro,clientes) => {
         if(erro){
             res.status(500).json({"erro:":"Database Error"})
@@ -15,6 +16,7 @@ exports.listar = (req, res) => {
 }
 
 exports.inserir = (req, res) => {    
+
     //Obter o dado do request - nome e o preco
     const cliente = req.body;
     
@@ -29,7 +31,8 @@ exports.inserir = (req, res) => {
     })
 }
 
-exports.buscarPorId = (req, res) => {    
+exports.buscarPorId = (req, res) => {  
+
     const id = +req.params.id;
     if(isNaN(id)){
         const error = {
@@ -51,6 +54,7 @@ exports.buscarPorId = (req, res) => {
 }
 
 exports.atualizar = (req, res) => {
+
     const id = +req.params.id;
     const cliente = req.body;
 
@@ -74,7 +78,7 @@ exports.atualizar = (req, res) => {
 }
 
 exports.deletar = (req, res) => {
-    const id = +req.params.id;
+
     if(isNaN(id)){
         const error = {
             status: 400,
@@ -144,7 +148,9 @@ exports.validarUsuario = (req, res) => {
 }
 
 exports.validarToken = (req, res, next) => {
+    console.log("Validando token");
     const token = req.get("x-auth-token");
+    console.log("Token user: " + token);
     if(!token) {
         const error = {
             status: 403,
@@ -158,9 +164,11 @@ exports.validarToken = (req, res, next) => {
                     status: 403,
                     msg: "Sem token de acesso"
                 }
+                console.log("Erro token: " + err);
                 res.status(error.status).json(error);
             } else {
-                console.log("Id do user: " + payload.id);
+                console.log("Payload: " + JSON.stringify(payload));
+                console.log("Nome do user: " + payload.nome);
                 next();
             }
         })
