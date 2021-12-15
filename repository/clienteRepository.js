@@ -4,29 +4,50 @@ exports.listar = (callback) => {
     const sql = "SELECT * FROM clientes";
 
     conexao.query(sql, (erro, rows) => {
-        if(erro){            
+        if (erro) {            
             callback(erro,null);
-        }
-        else {
+        } else {
             callback(null, rows);
         }
     })
 }
 
-exports.inserir = (cliente, callback) => {   
-    //SQL
-    const sql = "INSERT INTO clientes(nome, telefone) VALUES (?,?)"
-
-    conexao.query(sql, [cliente.nome, cliente.telefone],
+exports.inserir = (cliente, callback) => {
+    const sqlUser = "SELECT * FROM clientes WHERE username = ?";
+    conexao.query(sqlUser, [cliente.userName],
         (erro, rows) => {
-            if(erro){
-                callback(erro, null)
+            if (erro) {
+                console.log("Erro ao validar usuario: " + JSON.stringify(erro));
+                const error = {
+                    status: 500,
+                    msg: erro
+                }
+                callback(error, null);
+            } else {
+                console.log("Validando usuario: ");
+                if (rows && rows.length > 0) {
+                    console.log("Usuario já existe.");
+                    const error = {
+                        status: 422,
+                        msg: "Usuario jah cadastrado. Por favor verifique os dados informados"
+                   };
+                   callback(error, null);
+                } else {
+                    //SQL
+                    const sql = "INSERT INTO clientes(nome, telefone, username, senha) VALUES (?,?,?,?)"
+
+                    conexao.query(sql, [cliente.nome, cliente.telefone, cliente.userName, cliente.senha],
+                        (erro, rows) => {
+                            if (erro) {
+                                callback(erro, null);
+                            } else {
+                                cliente.id = rows.insertId;
+                                callback(null, cliente);
+                            }
+                    });
+                }
             }
-            else {
-                cliente.id = rows.insertId;
-                callback(null, cliente)
-            }
-    })    
+    });
 }
 
 exports.buscarPorId = (id, callback) => {
@@ -34,7 +55,7 @@ exports.buscarPorId = (id, callback) => {
     const sql = "SELECT * FROM clientes WHERE id=?";
 
     conexao.query(sql, [id], (err, rows) => {
-        if(err){
+        if (err) {
             const error = {
                 status: 500,
                 msg: err
@@ -42,10 +63,9 @@ exports.buscarPorId = (id, callback) => {
             callback(error, null);
         }
         else {
-            if(rows && rows.length > 0){
-                callback(null,rows[0])
-            }
-            else{ 
+            if (rows && rows.length > 0) {
+                callback(null,rows[0]);
+            } else { 
                 const error = {
                     status: 404,
                     msg: "Cliente nao encontrado!"
@@ -53,7 +73,7 @@ exports.buscarPorId = (id, callback) => {
                 callback(error, null);
             }
         }
-    })
+    });
 }
 
 exports.atualizar = (id, cliente, callback) => {
@@ -61,14 +81,13 @@ exports.atualizar = (id, cliente, callback) => {
     const sql = "UPDATE clientes SET nome=?, telefone=? WHERE id=?";
 
     conexao.query(sql, [cliente.nome, cliente.telefone, id], (err, clienteAtualizado) => {
-        if(err){
+        if (err) {
             const error = {
                 status: 500,
                 msg: err
             }
             callback(error, null);
-        }
-        else {
+        } else {
             if(clienteAtualizado.affectedRows > 0) {
                 callback(null, clienteAtualizado);
             } else {
@@ -101,10 +120,10 @@ exports.deletar = (id, callback) => {
                     status: 500,
                     msg: err
                 }
-                callback(err, null);    
+                callback(err, null);
             }
         }
-    })            
+    });
 }
 
 
@@ -113,23 +132,21 @@ exports.buscarPorUserName = (userName, callback) => {
     const sql = "SELECT * FROM clientes WHERE username=?";
 
     conexao.query(sql, [userName], (err, rows) => {
-        if(err){
+        if (err) {
             console.log("------_>>> falha ao consultar usuário.. " + err);
             const error = {
                 status: 500,
                 msg: err
-            }
+            };
             callback(error, null);
-        }
-        else {
+        } else {
             if(rows && rows.length > 0){
-                callback(null,rows[0])
-            }
-            else{ 
+                callback(null,rows[0]);
+            } else{ 
                 const error = {
                     status: 404,
                     msg: "Usuario nao encontrado!"
-                }
+                };
                 callback(error, null);
             }
         }

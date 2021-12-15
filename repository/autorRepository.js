@@ -15,7 +15,7 @@ exports.listar = (callback) => {
 
 exports.inserir = (autor, callback) => {   
     //SQL
-    const sql = "INSERT INTO autores(nome, pais) VALUES (?,?)"
+    const sql = "INSERT INTO autores(nome, pais) VALUES (?,?)";
 
     conexao.query(sql, [autor.nome, autor.pais],
         (erro, rows) => {

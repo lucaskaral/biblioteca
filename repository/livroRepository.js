@@ -18,7 +18,7 @@ exports.listar = (callback) => {
 exports.inserir = (livro, callback) => {   
     //SQL
     console.log("Inserindo livros");
-    const sql = "INSERT INTO livros(titulo, editora, ano_publicacao, ISBN) VALUES (?,?,?,?)"
+    const sql = "INSERT INTO livros(titulo, editora, ano_publicacao, ISBN) VALUES (?,?,STR_TO_DATE(?, '%d-%m-%Y'),?)"
 
     conexao.query(sql, [livro.titulo, livro.editora, livro.anoPublicacao, livro.ISBN],
         (erro, rows) => {
@@ -120,7 +120,7 @@ exports.buscarPorId = (id, callback) => {
 
 exports.atualizar = (id, livro, callback) => {
 
-    const sql = "UPDATE livros SET titulo=?, ISBN=?, ano_publicacao=?, editora=? WHERE id=?";
+    const sql = "UPDATE livros SET titulo=?, ISBN=?, ano_publicacao=STR_TO_DATE(?, '%d-%m-%Y'), editora=? WHERE id=?";
 
     conexao.query(sql, [livro.titulo, livro.ISBN, livro.anoPublicacao, livro.editora, id], (err, livroAtualizado) => {
         if (err) {
@@ -196,7 +196,7 @@ exports.deletarLivrosAutores = (id, callback) => {
 
 exports.buscarPorTitulo = (titulo, callback) => {
     console.log("buscando por titulo");
-    const sql = "SELECT * FROM livros WHERE titulo LIKE CONCAT('%', ? , '%')";
+    const sql = "SELECT * FROM livros WHERE upper(titulo) LIKE CONCAT('%', upper(?) , '%')";
 
     conexao.query(sql, [titulo], (err, rows) => {
         if(err){
@@ -208,7 +208,7 @@ exports.buscarPorTitulo = (titulo, callback) => {
         }
         else {
             if(rows && rows.length > 0){
-                callback(null,rows[0])
+                callback(null,rows)
             }
             else{ 
                 const error = {
@@ -234,7 +234,7 @@ exports.buscarPorAutor = (id_autor, callback) => {
             callback(error, null);
         } else {
             if (rows && rows.length > 0) {
-                callback(null,rows[0])
+                callback(null,rows)
             } else { 
                 const error = {
                     status: 404,

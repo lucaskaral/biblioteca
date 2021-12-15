@@ -2,7 +2,14 @@ const conexao = require('../config/conexaoDB')
 const livroRepository = require('../repository/livroRepository')
 
 exports.listar = (req, res) => {
-
+    console.log("Listando livros: " + JSON.stringify(req.body));
+    if (req.body.titulo) {
+        this.buscarPorTitulo(req, res);
+        return;
+    } else if (req.body.idAutor) {
+        this.buscarPorAutor(req, res);
+        return;
+    }
     livroRepository.listar((erro,livros) => {
         if(erro){
             res.status(500).json({"erro:":"Database Error"})
@@ -79,7 +86,7 @@ exports.buscarPorId = (req, res) => {
 }
 
 exports.atualizar = (req, res) => {
-
+    console.log("Atualizando livro");
     const id = +req.params.id;
     const livro = req.body;
 
@@ -129,9 +136,9 @@ exports.deletar = (req, res) => {
 }
 
 exports.buscarPorTitulo = (req, res) => {  
-
-    console.log("params: " + JSON.stringify(req.params));
-    const titulo = req.params.titulo;
+    console.log("Buscando livros por titulo.");
+    console.log("params: " + JSON.stringify(req.body));
+    const titulo = req.body.titulo;
     console.log(titulo);
     if(!titulo){
         const error = {
@@ -155,8 +162,8 @@ exports.buscarPorTitulo = (req, res) => {
 
 exports.buscarPorAutor = (req, res) => {
 
-    console.log("params: " + JSON.stringify(req.params));
-    const id_autor = req.params.id_autor;
+    console.log("body: " + JSON.stringify(req.body));
+    const id_autor = req.body.idAutor;
     console.log(id_autor);
     if (!id_autor) {
         const error = {
@@ -166,7 +173,7 @@ exports.buscarPorAutor = (req, res) => {
         res.status(error.status).json(error)
     }
     else{
-        livroRepository.buscarPorAutor(titulo, (erro, livros) => {
+        livroRepository.buscarPorAutor(id_autor, (erro, livros) => {
             if (erro) {
                 res.status(erro.status).json(erro)
             }
