@@ -6,13 +6,13 @@ exports.listar = (req, res) => {
 
     clienteRepository.listar((erro,clientes) => {
         if(erro){
-            res.status(500).json({"erro:":"Database Error"})
-            console.log(erro)
+            res.status(erro.status).json({"erro:":erro.msg});
+            console.log(erro);
         }
         else {
-            res.json(clientes)
+            res.json(clientes);
         }
-    })
+    });
 }
 
 exports.inserir = (req, res) => {    
@@ -22,11 +22,10 @@ exports.inserir = (req, res) => {
     
     clienteRepository.inserir(cliente, (erro, clienteSalvo) => {
         if(erro){
-            res.status(500).json({"erro:":"Database Error"})
+            res.status(erro.status).json({"erro:":erro.msg})
             console.log(erro)
-        }
-        else {
-            res.status(201).json(clienteSalvo)
+        } else {
+            res.status(201).json(clienteSalvo);
         }
     })
 }
@@ -39,15 +38,14 @@ exports.buscarPorId = (req, res) => {
             status: 400,
             msg: "Id deve ser um numero!"
         }
-        res.status(error.status).json(error)
+        res.status(error.status).json(error);
     }
     else{
         clienteRepository.buscarPorId(id, (erro, cliente) => {
-            if(erro){
-                res.status(erro.status).json(erro)
-            }
-            else {
-                res.json(cliente)
+            if (erro) {
+                res.status(erro.status).json(erro);
+            } else {
+                res.json(cliente);
             }
         })
     }
@@ -78,30 +76,27 @@ exports.atualizar = (req, res) => {
 }
 
 exports.deletar = (req, res) => {
-
-    if(isNaN(id)){
+    const id = req.params.id;
+    if (isNaN(id)) {
         const error = {
             status: 400,
             msg: "Id deve ser um numero"
         }
-        res.status(error.status).json(error)
-    }
-    else{
+        res.status(error.status).json(error);
+    } else {
         clienteRepository.buscarPorId(id, (erro, cliente) => {
-            if(erro){
+            if (erro) {
                 res.status(erro.status).json(erro)
-            }
-            else {
+            } else {
                 clienteRepository.deletar (id, (erro, id) => {
-                    if(erro){
+                    if (erro) {
                         res.status(erro.status).json(erro)
-                    }
-                    else {
+                    } else {
                         res.json(cliente)
-                    }        
-                })
+                    }
+                });
             }
-        })
+        });
     }
 }
 
