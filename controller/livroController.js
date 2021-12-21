@@ -2,7 +2,6 @@ const conexao = require('../config/conexaoDB')
 const livroRepository = require('../repository/livroRepository')
 
 exports.listar = (req, res) => {
-    console.log("Listando livros: " + JSON.stringify(req.body));
     if (req.body.titulo) {
         this.buscarPorTitulo(req, res);
         return;

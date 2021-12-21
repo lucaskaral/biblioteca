@@ -2,7 +2,7 @@ const { json } = require('express');
 const conexao = require('../config/conexaoDB')
 
 exports.listar = (callback) => {
-    console.log("Listando livros");
+
     const sql = "SELECT * FROM livros";
 
     conexao.query(sql, (erro, rows) => {

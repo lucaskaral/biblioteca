@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 21-Nov-2021 às 03:54
+-- Generation Time: 21-Dez-2021 às 23:32
 -- Versão do servidor: 10.1.38-MariaDB
 -- versão do PHP: 7.3.4
 
@@ -40,7 +40,8 @@ CREATE TABLE `autores` (
 
 INSERT INTO `autores` (`ID`, `nome`, `pais`) VALUES
 (1, 'Jostein Gaarder', 'Noruega'),
-(2, 'autor teste atualizado', 'pais teste atualizado');
+(2, 'autor teste atualizado', 'pais teste atualizado'),
+(4, 'lucas f k', 'colombia');
 
 -- --------------------------------------------------------
 
@@ -61,7 +62,7 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`ID`, `nome`, `telefone`, `username`, `senha`) VALUES
-(1, 'Lucas Formiga Karal', '51985093905', 'lucaskaral', 'password');
+(1, 'Lucas Formiga Karal', '55518569875', 'lucaskaral', 'password');
 
 -- --------------------------------------------------------
 
@@ -74,7 +75,7 @@ CREATE TABLE `livros` (
   `titulo` varchar(255) NOT NULL,
   `editora` varchar(255) NOT NULL,
   `ano_publicacao` date NOT NULL,
-  `ISBN` varchar(255) DEFAULT NULL
+  `ISBN` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -82,9 +83,9 @@ CREATE TABLE `livros` (
 --
 
 INSERT INTO `livros` (`ID`, `titulo`, `editora`, `ano_publicacao`, `ISBN`) VALUES
-(1, 'Livro teste novo', 'Editora teste novo', '2000-06-01', '978–85–333–0227–1'),
-(2, 'Titulo2', 'Editora2', '2021-06-01', NULL),
-(18, 'livro com autores', 'Editora A', '2000-11-11', NULL);
+(18, 'livro update', 'Editora B', '2021-11-11', '978–85–333–0227–30'),
+(19, 'O mundo de Sofia', 'Editora A', '0000-00-00', '978–85–333–0227–4'),
+(58, 'O mundo de Sofia 2', 'Editora A', '0000-00-00', '978–85–333–0227–6');
 
 -- --------------------------------------------------------
 
@@ -103,28 +104,32 @@ CREATE TABLE `livros_autores` (
 
 INSERT INTO `livros_autores` (`id_livro`, `id_autor`) VALUES
 (18, 1),
-(18, 2);
+(18, 2),
+(19, 1),
+(19, 2),
+(58, 1);
 
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `reservas`
+-- Estrutura da tabela `livros_reservados`
 --
 
-CREATE TABLE `reservas` (
-  `ID` int(11) NOT NULL,
+CREATE TABLE `livros_reservados` (
+  `id` int(11) NOT NULL,
+  `id_cliente` int(11) NOT NULL,
   `id_livro` int(11) NOT NULL,
-  `id:cliente` int(11) NOT NULL,
   `data_inicio` date NOT NULL,
   `data_fim` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Extraindo dados da tabela `reservas`
+-- Extraindo dados da tabela `livros_reservados`
 --
 
-INSERT INTO `reservas` (`ID`, `id_livro`, `id:cliente`, `data_inicio`, `data_fim`) VALUES
-(2, 1, 0, '2021-06-06', '2021-06-26');
+INSERT INTO `livros_reservados` (`id`, `id_cliente`, `id_livro`, `data_inicio`, `data_fim`) VALUES
+(1, 1, 1, '2022-10-10', '2022-11-10'),
+(2, 1, 1, '2023-10-10', '2023-11-10');
 
 --
 -- Indexes for dumped tables
@@ -160,12 +165,10 @@ ALTER TABLE `livros_autores`
   ADD KEY `id_autor` (`id_autor`);
 
 --
--- Indexes for table `reservas`
+-- Indexes for table `livros_reservados`
 --
-ALTER TABLE `reservas`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `id_cliente` (`id:cliente`),
-  ADD KEY `fk_livro` (`id_livro`);
+ALTER TABLE `livros_reservados`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -175,7 +178,7 @@ ALTER TABLE `reservas`
 -- AUTO_INCREMENT for table `autores`
 --
 ALTER TABLE `autores`
-  MODIFY `ID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `clientes`
@@ -187,13 +190,13 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT for table `livros`
 --
 ALTER TABLE `livros`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
--- AUTO_INCREMENT for table `reservas`
+-- AUTO_INCREMENT for table `livros_reservados`
 --
-ALTER TABLE `reservas`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `livros_reservados`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -207,12 +210,6 @@ ALTER TABLE `livros_autores`
   ADD CONSTRAINT `livros_autores_ibfk_2` FOREIGN KEY (`id_livro`) REFERENCES `livros` (`ID`),
   ADD CONSTRAINT `livros_autores_ibfk_3` FOREIGN KEY (`id_livro`) REFERENCES `livros` (`ID`),
   ADD CONSTRAINT `livros_autores_ibfk_4` FOREIGN KEY (`id_autor`) REFERENCES `autores` (`ID`);
-
---
--- Limitadores para a tabela `reservas`
---
-ALTER TABLE `reservas`
-  ADD CONSTRAINT `fk_livro` FOREIGN KEY (`id_livro`) REFERENCES `livros` (`ID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
