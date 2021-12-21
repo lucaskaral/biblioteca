@@ -16,6 +16,7 @@ exports.listar = (req, res) => {
             console.log(erro)
         }
         else {
+            console.log(JSON.stringify(livros));
             res.json(livros)
         }
     })

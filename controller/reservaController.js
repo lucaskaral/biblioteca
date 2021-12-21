@@ -18,11 +18,14 @@ exports.inserir = (req, res) => {
     const reserva = req.body;
     
     reservaRepository.inserir(reserva, (erro, reservaSalva) => {
-        if(erro){
-            res.status(500).json({"erro:":"Database Error"})
+        if (erro) {
+            var msgError = "Database error";
+            if (erro.msg) {
+                msgError = erro.msg;
+            }
+            res.status(500).json({"erro:":msgError});
             console.log(erro)
-        }
-        else {
+        } else {
             res.status(201).json(reservaSalva)
         }
     })

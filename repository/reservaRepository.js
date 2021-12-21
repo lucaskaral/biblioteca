@@ -10,55 +10,69 @@ exports.listar = (callback) => {
         else {
             callback(null, rows);
         }
-    })
+    });
 }
 
-exports.inserir = (reserva, callback) => {   
-    //SQL
-    const sql = "INSERT INTO reservas(id_livro, id_cliente, data_inicio, data_fim) VALUES (?,?,?)"
-
-    conexao.query(sql, [reserva.idLivro, reserva.id_cliente, reserva.dataInicio, reserva.dataFim],
+exports.inserir = (reserva, callback) => {
+    //Verifica se o livro já possui alguma reserva no período das datas informadas.
+    const sqlValidaData = "SELECT * FROM livros_reservados where id_livro = ? AND data_inicio >= STR_TO_DATE(?, '%d-%m-%Y') AND data_fim <= STR_TO_DATE(?, '%d-%m-%Y')";
+    conexao.query(sqlValidaData, [reserva.idLivro, reserva.dataInicio, reserva.dataFim],
         (erro, rows) => {
-            if(erro){
-                callback(erro, null)
+            if (erro) {
+                callback(erro, null);
+            } else {
+                if (rows && rows.length > 0) {
+                    const error = {
+                        status: 500,
+                        msg: "Já existe reserva para o livro no período informado. Por favor verifique os dados informados!"
+                    };
+                    callback(error, null);
+                } else {
+                    const sql = "INSERT INTO livros_reservados(id_livro, id_cliente, data_inicio, data_fim) VALUES (?,?,STR_TO_DATE(?, '%d-%m-%Y'),STR_TO_DATE(?, '%d-%m-%Y'))";
+
+                    conexao.query(sql, [reserva.idLivro, reserva.idCliente, reserva.dataInicio, reserva.dataFim],
+                        (erro, rows) => {
+                            if (erro) {
+                                callback(erro, null);
+                            } else {
+                                reserva.id = rows.insertId;
+                                callback(null, reserva);
+                            }
+                    });
+                }
             }
-            else {
-                reserva.id = rows.insertId;
-                callback(null, reserva)
-            }
-    })    
+        });
 }
 
 exports.buscarPorId = (id, callback) => {
 
-    const sql = "SELECT * FROM reservas WHERE id=?";
+    const sql = "SELECT * FROM livros_reservados WHERE id=?";
 
     conexao.query(sql, [id], (err, rows) => {
-        if(err){
+        if (err) {
             const error = {
                 status: 500,
                 msg: err
-            }
+            };
             callback(error, null);
         }
         else {
-            if(rows && rows.length > 0){
+            if (rows && rows.length > 0) {
                 callback(null,rows[0])
-            }
-            else{ 
+            } else { 
                 const error = {
                     status: 404,
                     msg: "Reserva nao encontrada!"
-                }
+                };
                 callback(error, null);
             }
         }
-    })
+    });
 }
 
 exports.atualizar = (id, reserva, callback) => {
 
-    const sql = "UPDATE reservas SET livro_id=?, data_inicio=?, data_fim=? WHERE id=?";
+    const sql = "UPDATE livros_reservados SET livro_id=?, data_inicio=?, data_fim=? WHERE id=?";
 
     conexao.query(sql, [reserva.idLivro, reserva.dataInicio, reserva.dataFim, id], (err, reservaAtualizada) => {
         if(err){
@@ -83,7 +97,7 @@ exports.atualizar = (id, reserva, callback) => {
 }
 
 exports.deletar = (id, callback) => {
-    const sql = `DELETE FROM reservas WHERE id=?`;
+    const sql = `DELETE FROM livros_reservados WHERE id=?`;
     conexao.query(sql, [id], (err, rows) => {
         if(err){
             const error = {
